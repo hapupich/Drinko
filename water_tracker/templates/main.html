@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Water Tracker</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='mainStyles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Water Tracker</h1>
+        <p><strong>Goal:</strong> {{ goal }} ml</p>
+        <p><strong>Achieved:</strong> {{ achieved }} ml</p>
+        <div class="progress-bar">
+            <div style="width: {{ progress }}%;">{{ progress }}%</div>
+        </div>
+        <form action="/add_water" method="POST">
+            <input type="number" name="amount" placeholder="Add water (ml)" required>
+            <button type="submit">Add</button>
+        </form>
+        <div class="links">
+            <a href="/profile">Profile</a>
+            <a href="/logout" class="btn-secondary">Logout</a>
+        </div>
+    </div>
+</body>
+</html>
