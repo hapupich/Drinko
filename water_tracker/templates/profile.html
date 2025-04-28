@@ -10,10 +10,18 @@
     <div class="container">
         <h1>Profile</h1>
         <p><strong>Username:</strong> {{ username }}</p>
-        <p><strong>Yesterday's Water Intake:</strong> {{ yesterday_amount }} ml</p>
+    
+        <h2>Yesterday's Intake:</h2>
+        <ul>
+            {% for liquid, amount in liquid_totals.items() %}
+                <li>{{ liquid }}: {{ amount }} ml</li>
+            {% endfor %}
+        </ul>
+    
         <div class="links">
             <a href="/">Back to Main</a>
             <a href="/auth/logout" class="btn-secondary">Logout</a>
         </div>
+    </div>
 </body>
 </html>

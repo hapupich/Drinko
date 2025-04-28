@@ -15,9 +15,15 @@
             <div style="width: {{ progress }}%;">{{ progress }}%</div>
         </div>
         <form action="/add_water" method="POST">
-            <input type="number" name="amount" placeholder="Add water (ml)" required>
+            <select name="liquid" required>
+                {% for liquid in liquids %}
+                    <option value="{{ liquid.name }}">{{ liquid.name }}</option>
+                {% endfor %}
+            </select>
+            <input type="number" name="amount" placeholder="Amount (ml)" required>
             <button type="submit">Add</button>
         </form>
+        
         <div class="links">
             <a href="/profile">Profile</a>
             <a href="/auth/logout" class="btn-secondary">Logout</a>

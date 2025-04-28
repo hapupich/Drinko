@@ -11,13 +11,17 @@ def main_page():
     username = session["username"]
     today = datetime.now().strftime("%Y-%m-%d")
     user = mongo.db.users.find_one({"username": username})
-    log = mongo.db.water_logs.find_one({"username": username, "date": today})
     
+    logs = mongo.db.water_logs.find({"username": username, "date": today})
+
+    achieved = sum(log["amount"] for log in logs)
+
     goal = user.get("daily_goal", 2000)  # Default goal: 2000ml
-    achieved = log["amount"] if log else 0
     progress = int((achieved / goal) * 100) if goal > 0 else 0
-    
-    return render_template("main.html", goal=goal, achieved=achieved, progress=progress)
+
+    liquids = mongo.db.liquids.find()
+
+    return render_template("main.html", goal=goal, achieved=achieved, progress=progress, liquids=liquids)
 
 @main_bp.route("/add_water", methods=["POST"])
 def add_water():
@@ -31,21 +35,16 @@ def add_water():
         amount = int(request.form["amount"])
         if amount <= 0:
             return "Invalid amount", 400
-    except ValueError:
+        liquid = request.form["liquid"]
+    except (ValueError, KeyError):
         return "Invalid input", 400
     
-    log = mongo.db.water_logs.find_one({"username": username, "date": today})
-    if log:
-        mongo.db.water_logs.update_one(
-            {"username": username, "date": today},
-            {"$inc": {"amount": amount}}
-        )
-    else:
-        mongo.db.water_logs.insert_one({
-            "username": username,
-            "date": today,
-            "amount": amount
-        })
+    mongo.db.water_logs.insert_one({
+        "username": username,
+        "date": today,
+        "liquid": liquid,
+        "amount": amount
+    })
     
     return redirect("/")
 
@@ -56,7 +55,13 @@ def profile():
     
     username = session["username"]
     yesterday = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
-    log = mongo.db.water_logs.find_one({"username": username, "date": yesterday})
-    yesterday_amount = log["amount"] if log else 0
     
-    return render_template("profile.html", username=username, yesterday_amount=yesterday_amount)
+    logs = mongo.db.water_logs.find({"username": username, "date": yesterday})
+    
+    liquid_totals = {}
+    for log in logs:
+        liquid = log.get("liquid", "Unknown")
+        amount = log.get("amount", 0)
+        liquid_totals[liquid] = liquid_totals.get(liquid, 0) + amount
+
+    return render_template("profile.html", username=username, liquid_totals=liquid_totals)
