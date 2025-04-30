@@ -20,7 +20,7 @@ def register():
             elif gender == "female":
                 daily_goal = int(weight * 31)
             else:
-                daily_goal = 2000  # default fallback
+                daily_goal = 2000
 
         if mongo.db.users.find_one({"username": username}):
             return "User already exists!"
@@ -33,9 +33,25 @@ def register():
             "height": height,
             "daily_goal": daily_goal
         })
-        return redirect("/auth/login")
+
+        session["just_registered"] = {
+            "username": username,
+            "gender": gender,
+            "weight": weight,
+            "height": height,
+            "daily_goal": daily_goal
+        }
+
+        return redirect("/auth/show_goal")
     
     return render_template("register.html")
+
+@auth_bp.route("/show_goal")
+def show_goal():
+    data = session.get("just_registered")
+    if not data:
+        return redirect("/auth/login")
+    return render_template("show_goal.html", user_data=data)
 
 @auth_bp.route("/login", methods=["GET", "POST"])
 def login():
