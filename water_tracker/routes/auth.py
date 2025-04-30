@@ -7,14 +7,30 @@ def register():
     if request.method == "POST":
         username = request.form["username"]
         password = request.form["password"]
-        daily_goal = int(request.form["daily_goal"])
+        gender = request.form["gender"]
+        weight = float(request.form["weight"])
+        height = float(request.form["height"])
         
+        custom_goal_checked = "custom_goal_checkbox" in request.form
+        if custom_goal_checked and request.form["daily_goal"]:
+            daily_goal = int(request.form["daily_goal"])
+        else:
+            if gender == "male":
+                daily_goal = int(weight * 35)
+            elif gender == "female":
+                daily_goal = int(weight * 31)
+            else:
+                daily_goal = 2000  # default fallback
+
         if mongo.db.users.find_one({"username": username}):
             return "User already exists!"
-        
+
         mongo.db.users.insert_one({
             "username": username,
             "password": password,
+            "gender": gender,
+            "weight": weight,
+            "height": height,
             "daily_goal": daily_goal
         })
         return redirect("/auth/login")
