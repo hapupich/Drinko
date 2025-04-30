@@ -54,14 +54,25 @@ def profile():
         return redirect("/auth/login")
     
     username = session["username"]
-    yesterday = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
+    user = mongo.db.users.find_one({"username": username})
     
+    yesterday = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
     logs = mongo.db.water_logs.find({"username": username, "date": yesterday})
     
-    liquid_totals = {}
+    drinks_summary = {}
     for log in logs:
-        liquid = log.get("liquid", "Unknown")
+        drink = log.get("drink", "Unknown")
         amount = log.get("amount", 0)
-        liquid_totals[liquid] = liquid_totals.get(liquid, 0) + amount
+        drinks_summary[drink] = drinks_summary.get(drink, 0) + amount
+    
+    return render_template(
+        "profile.html",
+        username=username,
+        yesterday_amount=sum(drinks_summary.values()),
+        drinks_summary=drinks_summary,
+        gender=user.get("gender"),
+        weight=user.get("weight"),
+        height=user.get("height"),
+        daily_goal=user.get("daily_goal")
+    )
 
-    return render_template("profile.html", username=username, liquid_totals=liquid_totals)

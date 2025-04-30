@@ -7,21 +7,29 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='mainStyles.css') }}">
 </head>
 <body>
-    <div class="container">
-        <h1>Profile</h1>
-        <p><strong>Username:</strong> {{ username }}</p>
-    
-        <h2>Yesterday's Intake:</h2>
+<div class="container">
+    <h1>Profile</h1>
+    <p><strong>Username:</strong> {{ username }}</p>
+    <p><strong>Gender:</strong> {{ gender }}</p>
+    <p><strong>Weight:</strong> {{ weight }} kg</p>
+    <p><strong>Height:</strong> {{ height }} cm</p>
+    <p><strong>Daily Water Goal:</strong> {{ daily_goal }} ml</p>
+
+    <h2>Yesterday's Intake by Drink</h2>
+    {% if drink_data %}
         <ul>
-            {% for liquid, amount in liquid_totals.items() %}
-                <li>{{ liquid }}: {{ amount }} ml</li>
+            {% for item in drink_data %}
+                <li>{{ item._id }}: {{ item.total }} ml</li>
             {% endfor %}
         </ul>
-    
-        <div class="links">
-            <a href="/">Back to Main</a>
-            <a href="/auth/logout" class="btn-secondary">Logout</a>
-        </div>
+    {% else %}
+        <p>No drinks recorded yesterday.</p>
+    {% endif %}
+
+    <div class="links">
+        <a href="/">Back to Main</a>
+        <a href="/auth/logout" class="btn-secondary">Logout</a>
     </div>
+</div>
 </body>
 </html>
