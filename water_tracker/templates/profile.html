@@ -16,10 +16,10 @@
     <p><strong>Daily Water Goal:</strong> {{ daily_goal }} ml</p>
 
     <h2>Yesterday's Intake by Drink</h2>
-    {% if drink_data %}
+    {% if drinks_summary %}
         <ul>
-            {% for item in drink_data %}
-                <li>{{ item._id }}: {{ item.total }} ml</li>
+            {% for drink, amount in drinks_summary.items() %}
+                <li>{{ drink }}: {{ amount }} ml</li>
             {% endfor %}
         </ul>
     {% else %}

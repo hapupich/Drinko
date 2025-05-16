@@ -58,17 +58,20 @@ def profile():
     
     yesterday = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
     logs = mongo.db.water_logs.find({"username": username, "date": yesterday})
-    
+
     drinks_summary = {}
+    total_yesterday = 0
+
     for log in logs:
-        drink = log.get("drink", "Unknown")
+        drink = log.get("liquid", "Unknown")
         amount = log.get("amount", 0)
         drinks_summary[drink] = drinks_summary.get(drink, 0) + amount
+        total_yesterday += amount
     
     return render_template(
         "profile.html",
         username=username,
-        yesterday_amount=sum(drinks_summary.values()),
+        yesterday_amount=total_yesterday,
         drinks_summary=drinks_summary,
         gender=user.get("gender"),
         weight=user.get("weight"),
